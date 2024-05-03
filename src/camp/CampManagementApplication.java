@@ -5,6 +5,7 @@ import camp.model.Student;
 import camp.model.Subject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -166,20 +167,49 @@ public class CampManagementApplication {
 
     // 수강생 등록
     private static void createStudent() {
+        String studentSubject;
+        List<String> studentsubjectList = new ArrayList<>();
+        sc.nextLine();
         System.out.println("\n수강생을 등록합니다...");
         System.out.print("수강생 이름 입력: ");
-        String studentName = sc.next();
-        // 기능 구현 (필수 과목, 선택 과목)
+        String studentName = sc.nextLine();
+        do {
+            System.out.println("수강생의 필수과목 목록을 입력해주세요. [Java 객체지향 Spring JPA MySQL]");
+            studentSubject = sc.nextLine();
+        }while(studentSubject.split(" ").length<2);
+        //띄어쓰기가 2번이상 - 그러니까 3개이상 입력해야 넘어감.
+        studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
+        do {
+            System.out.println("수강생의 선택과목 목록을 입력해주세요. [디자인_패턴 Spring_Security Redis MongoDB]");
+            studentSubject = sc.nextLine();
+        }while(studentSubject.split(" ").length<1);
+        //띄어쓰기가 1번이상 - 그러니까 2개이상 입력해야 넘어감.
+        studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
+        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, String.join(", ",studentsubjectList));
+        System.out.println("수강생을 등록 하시겠습니까?");
+        System.out.println("1. 네");
+        System.out.println("2. 아니오");
+        int input = sc.nextInt();
 
-        Student student = new Student(sequence(INDEX_TYPE_STUDENT), studentName); // 수강생 인스턴스 생성 예시 코드
-        // 기능 구현
-        System.out.println("수강생 등록 성공!\n");
+        if(input == 1) {
+            Student student = new Student(studentName);
+            for (String subjectName : studentsubjectList) {
+                student.getSubjectList().add(subjectName);
+            }
+            studentStore.add(student);
+            System.out.println("수강생 등록 성공!\n");
+        }else{
+            System.out.println("수강생 등록을 취소하셨습니다.\n");
+            displayStudentView();
+        }
     }
 
     // 수강생 목록 조회
     private static void inquireStudent() {
         System.out.println("\n수강생 목록을 조회합니다...");
-        // 기능 구현
+        for(Student student:studentStore){
+            System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ",student.getSubjectList()));
+        }
         System.out.println("\n수강생 목록 조회 성공!");
     }
 
