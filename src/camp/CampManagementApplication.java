@@ -4,9 +4,7 @@ import camp.model.Score;
 import camp.model.Student;
 import camp.model.Subject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Notification
@@ -26,6 +24,7 @@ public class CampManagementApplication {
     private static String SUBJECT_TYPE_MANDATORY = "MANDATORY";
     private static String SUBJECT_TYPE_CHOICE = "CHOICE";
 
+//    private static Map<String,String> subjectMap = new HashMap<>();
     // index 관리 필드
     private static int studentIndex;
     private static final String INDEX_TYPE_STUDENT = "ST";
@@ -39,8 +38,12 @@ public class CampManagementApplication {
 
     public static void main(String[] args) {
         setInitData();
+//        for (Map.Entry<String, String> entry : subjectMap.entrySet()) {
+//            System.out.println("[Key]:" + entry.getKey() + " [Value]:" + entry.getValue());
+//        }
         try {
             displayMainView();
+
         } catch (Exception e) {
             System.out.println("\n오류 발생!\n프로그램을 종료합니다.");
         }
@@ -49,6 +52,16 @@ public class CampManagementApplication {
     // 초기 데이터 생성
     private static void setInitData() {
         studentStore = new ArrayList<>();
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Java");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"객체지향");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Spring");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"JPA");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"MySQL");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"디자인 패턴");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Spring Security");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Redis");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"MongoDB");
+
         subjectStore = List.of(
                 new Subject(
                         sequence(INDEX_TYPE_SUBJECT),
@@ -166,21 +179,88 @@ public class CampManagementApplication {
 
     // 수강생 등록
     private static void createStudent() {
+        String studentSubject;
+        List<String> studentsubjectList = new ArrayList<>();
+        boolean validInput = true;
+        sc.nextLine();
         System.out.println("\n수강생을 등록합니다...");
         System.out.print("수강생 이름 입력: ");
-        String studentName = sc.next();
-        // 기능 구현 (필수 과목, 선택 과목)
+        String studentName = sc.nextLine();
+        do {
+            System.out.println("수강생의 필수과목 목록 중 3가지 선택해주세요. [1.Java 2.객체지향 3.Spring 4.JPA 5.MySQL]");
+            studentSubject = sc.nextLine();
+            validInput = true;
+            // 입력값을 공백으로 분할하여 확인
+            String[] subjects = studentSubject.split(" ");
 
-        Student student = new Student(sequence(INDEX_TYPE_STUDENT), studentName); // 수강생 인스턴스 생성 예시 코드
-        // 기능 구현
-        System.out.println("수강생 등록 성공!\n");
+            // 각 입력값이 1~5사이 값으로만 이루어져 있는지 확인
+            for (String subject : subjects) {
+                if (!subject.matches("[1-5]+")) {
+                    validInput = false;
+                    break;
+                }
+            }
+            // 유효하지 않은 입력일 경우 오류 메시지 출력
+            if (!validInput ||  studentSubject.split(" ").length < 3) {
+                System.out.println("잘못된 선택입니다.");
+            }
+        } while (!validInput || studentSubject.split(" ").length < 3);
+        //3개 이상 작성
+        Arrays.asList(studentSubject.split(" ")).forEach(subject -> {
+            int subjectNumber = Integer.parseInt(subject)-1;
+            studentsubjectList.add(subjectStore.get(subjectNumber).getSubjectName());
+        });
+        do {
+            System.out.println("수강생의 선택과목 목록 중 2가지 선택해주세요. [1.디자인_패턴 2.Spring_Security 3.Redis 4.MongoDB]");
+            studentSubject = sc.nextLine();
+            validInput = true;
+            // 입력값을 공백으로 분할하여 확인
+            String[] subjects = studentSubject.split(" ");
+
+            // 각 입력값이 1~4사이 값으로만 이루어져 있는지 확인
+            for (String subject : subjects) {
+                if (!subject.matches("[1-4]+")) {
+                    validInput = false;
+                    break;
+                }
+            }
+            // 유효하지 않은 입력일 경우 오류 메시지 출력
+            if (!validInput ||  studentSubject.split(" ").length < 2) {
+                System.out.println("잘못된 선택입니다.");
+            }
+        } while (!validInput || studentSubject.split(" ").length < 2);
+        //2개 이상 작성
+        Arrays.asList(studentSubject.split(" ")).forEach(subject -> {
+            int subjectNumber = Integer.parseInt(subject)+4;
+            studentsubjectList.add(subjectStore.get(subjectNumber).getSubjectName());
+        });
+        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, String.join(", ", studentsubjectList));
+        System.out.println("수강생을 등록 하시겠습니까?");
+        System.out.println("1. 네");
+        System.out.println("2. 아니오");
+        int input = sc.nextInt();
+
+        if (input == 1) {
+            Student student = new Student(studentName);
+            for (String s : studentsubjectList) {
+                student.getSubjectList().add(s);
+            }
+            studentStore.add(student);
+
+            System.out.println("수강생 등록 성공!\n");
+        } else {
+            System.out.println("수강생 등록을 취소하셨습니다.\n");
+        }
+
     }
 
     // 수강생 목록 조회
     private static void inquireStudent() {
         System.out.println("\n수강생 목록을 조회합니다...");
-        // 기능 구현
-        System.out.println("\n수강생 목록 조회 성공!");
+        for (Student student : studentStore) {
+                System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ", student.getSubjectList()));
+          }
+            System.out.println("\n수강생 목록 조회 성공!");
     }
 
     private static void displayScoreView() {
