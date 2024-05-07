@@ -375,4 +375,5 @@ public class CampManagementApplication {
         System.out.println("\n등급 조회 성공!");
     }
 
+
 }
