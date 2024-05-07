@@ -4,10 +4,7 @@ import camp.model.Score;
 import camp.model.Student;
 import camp.model.Subject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Notification
@@ -27,6 +24,7 @@ public class CampManagementApplication {
     private static String SUBJECT_TYPE_MANDATORY = "MANDATORY";
     private static String SUBJECT_TYPE_CHOICE = "CHOICE";
 
+//    private static Map<String,String> subjectMap = new HashMap<>();
     // index 관리 필드
     private static int studentIndex;
     private static final String INDEX_TYPE_STUDENT = "ST";
@@ -40,8 +38,12 @@ public class CampManagementApplication {
 
     public static void main(String[] args) {
         setInitData();
+//        for (Map.Entry<String, String> entry : subjectMap.entrySet()) {
+//            System.out.println("[Key]:" + entry.getKey() + " [Value]:" + entry.getValue());
+//        }
         try {
             displayMainView();
+
         } catch (Exception e) {
             System.out.println("\n오류 발생!\n프로그램을 종료합니다.");
         }
@@ -50,6 +52,16 @@ public class CampManagementApplication {
     // 초기 데이터 생성
     private static void setInitData() {
         studentStore = new ArrayList<>();
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Java");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"객체지향");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Spring");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"JPA");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"MySQL");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"디자인 패턴");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Spring Security");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"Redis");
+//        subjectMap.put(sequence(INDEX_TYPE_SUBJECT),"MongoDB");
+
         subjectStore = List.of(
                 new Subject(
                         sequence(INDEX_TYPE_SUBJECT),
@@ -169,46 +181,66 @@ public class CampManagementApplication {
     private static void createStudent() {
         String studentSubject;
         List<String> studentsubjectList = new ArrayList<>();
+        List<String> subjectName = new ArrayList<>();
         sc.nextLine();
         System.out.println("\n수강생을 등록합니다...");
         System.out.print("수강생 이름 입력: ");
         String studentName = sc.nextLine();
         do {
-            System.out.println("수강생의 필수과목 목록을 입력해주세요. [Java 객체지향 Spring JPA MySQL]");
+            System.out.println("수강생의 필수과목 목록 중 3가지 선택해주세요. [1.Java 2.객체지향 3.Spring 4.JPA 5.MySQL]");
             studentSubject = sc.nextLine();
-        }while(studentSubject.split(" ").length<2);
+        } while (studentSubject.split(" ").length < 2);
         //띄어쓰기가 2번이상 - 그러니까 3개이상 입력해야 넘어감.
         studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
         do {
-            System.out.println("수강생의 선택과목 목록을 입력해주세요. [디자인_패턴 Spring_Security Redis MongoDB]");
+            System.out.println("수강생의 선택과목 목록 중 2가지 선택해주세요. [6.디자인_패턴 7.Spring_Security 8.Redis 9.MongoDB]");
             studentSubject = sc.nextLine();
-        }while(studentSubject.split(" ").length<1);
+        } while (studentSubject.split(" ").length < 1);
         //띄어쓰기가 1번이상 - 그러니까 2개이상 입력해야 넘어감.
         studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
-        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, String.join(", ",studentsubjectList));
+        studentsubjectList.replaceAll(s -> "SU" + s);
+
+        for (String s : studentsubjectList) {
+            for (Subject subject : subjectStore) {
+                if (subject.getSubjectId().equals(s)) {
+                    subjectName.add(subject.getSubjectName());
+                }
+            }
+        }
+        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, String.join(", ", subjectName));
         System.out.println("수강생을 등록 하시겠습니까?");
         System.out.println("1. 네");
         System.out.println("2. 아니오");
         int input = sc.nextInt();
 
-        if(input == 1) {
+        if (input == 1) {
             Student student = new Student(studentName);
-            for (String subjectName : studentsubjectList) {
-                student.getSubjectList().add(subjectName);
+            for (String s : studentsubjectList) {
+                student.getSubjectList().add(s);
             }
             studentStore.add(student);
+
             System.out.println("수강생 등록 성공!\n");
-        }else{
+        } else {
             System.out.println("수강생 등록을 취소하셨습니다.\n");
             displayStudentView();
         }
+
     }
 
     // 수강생 목록 조회
     private static void inquireStudent() {
+        List<String> subjectName = new ArrayList<>();
         System.out.println("\n수강생 목록을 조회합니다...");
-        for(Student student:studentStore){
-            System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ",student.getSubjectList()));
+        for (Student student : studentStore) {
+            for (String s : student.getSubjectList()) {
+                for (Subject subject : subjectStore) {
+                    if (subject.getSubjectId().equals(s)) {
+                        subjectName.add(subject.getSubjectName());
+                    }
+                }
+            }
+            System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ", subjectName));
         }
         System.out.println("\n수강생 목록 조회 성공!");
     }
