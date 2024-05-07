@@ -193,11 +193,14 @@ public class CampManagementApplication {
         //띄어쓰기가 2번이상 - 그러니까 3개이상 입력해야 넘어감.
         studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
         do {
-            System.out.println("수강생의 선택과목 목록 중 2가지 선택해주세요. [6.디자인_패턴 7.Spring_Security 8.Redis 9.MongoDB]");
+            System.out.println("수강생의 선택과목 목록 중 2가지 선택해주세요. [1.디자인_패턴 2.Spring_Security 3.Redis 4.MongoDB]");
             studentSubject = sc.nextLine();
         } while (studentSubject.split(" ").length < 1);
         //띄어쓰기가 1번이상 - 그러니까 2개이상 입력해야 넘어감.
-        studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
+        Arrays.asList(studentSubject.split(" ")).forEach(subject -> {
+            int subjectNumber = Integer.parseInt(subject)+5;
+            studentsubjectList.add(String.valueOf(subjectNumber));
+        });
         studentsubjectList.replaceAll(s -> "SU" + s);
 
         for (String s : studentsubjectList) {
@@ -230,9 +233,10 @@ public class CampManagementApplication {
 
     // 수강생 목록 조회
     private static void inquireStudent() {
-        List<String> subjectName = new ArrayList<>();
+        List<String> subjectName = null;
         System.out.println("\n수강생 목록을 조회합니다...");
         for (Student student : studentStore) {
+            subjectName = new ArrayList<>();
             for (String s : student.getSubjectList()) {
                 for (Subject subject : subjectStore) {
                     if (subject.getSubjectId().equals(s)) {
@@ -241,6 +245,7 @@ public class CampManagementApplication {
                 }
             }
             System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ", subjectName));
+
         }
         System.out.println("\n수강생 목록 조회 성공!");
     }
