@@ -181,7 +181,7 @@ public class CampManagementApplication {
     private static void createStudent() {
         String studentSubject;
         List<String> studentsubjectList = new ArrayList<>();
-        List<String> subjectName = new ArrayList<>();
+        boolean validInput = true;
         sc.nextLine();
         System.out.println("\n수강생을 등록합니다...");
         System.out.print("수강생 이름 입력: ");
@@ -189,28 +189,52 @@ public class CampManagementApplication {
         do {
             System.out.println("수강생의 필수과목 목록 중 3가지 선택해주세요. [1.Java 2.객체지향 3.Spring 4.JPA 5.MySQL]");
             studentSubject = sc.nextLine();
-        } while (studentSubject.split(" ").length < 2);
-        //띄어쓰기가 2번이상 - 그러니까 3개이상 입력해야 넘어감.
-        studentsubjectList.addAll(Arrays.asList(studentSubject.split(" ")));
+            validInput = true;
+            // 입력값을 공백으로 분할하여 확인
+            String[] subjects = studentSubject.split(" ");
+
+            // 각 입력값이 1~5사이 값으로만 이루어져 있는지 확인
+            for (String subject : subjects) {
+                if (!subject.matches("[1-5]+")) {
+                    validInput = false;
+                    break;
+                }
+            }
+            // 유효하지 않은 입력일 경우 오류 메시지 출력
+            if (!validInput ||  studentSubject.split(" ").length < 3) {
+                System.out.println("잘못된 선택입니다.");
+            }
+        } while (!validInput || studentSubject.split(" ").length < 3);
+        //3개 이상 작성
+        Arrays.asList(studentSubject.split(" ")).forEach(subject -> {
+            int subjectNumber = Integer.parseInt(subject)-1;
+            studentsubjectList.add(subjectStore.get(subjectNumber).getSubjectName());
+        });
         do {
             System.out.println("수강생의 선택과목 목록 중 2가지 선택해주세요. [1.디자인_패턴 2.Spring_Security 3.Redis 4.MongoDB]");
             studentSubject = sc.nextLine();
-        } while (studentSubject.split(" ").length < 1);
-        //띄어쓰기가 1번이상 - 그러니까 2개이상 입력해야 넘어감.
-        Arrays.asList(studentSubject.split(" ")).forEach(subject -> {
-            int subjectNumber = Integer.parseInt(subject)+5;
-            studentsubjectList.add(String.valueOf(subjectNumber));
-        });
-        studentsubjectList.replaceAll(s -> "SU" + s);
+            validInput = true;
+            // 입력값을 공백으로 분할하여 확인
+            String[] subjects = studentSubject.split(" ");
 
-        for (String s : studentsubjectList) {
-            for (Subject subject : subjectStore) {
-                if (subject.getSubjectId().equals(s)) {
-                    subjectName.add(subject.getSubjectName());
+            // 각 입력값이 1~4사이 값으로만 이루어져 있는지 확인
+            for (String subject : subjects) {
+                if (!subject.matches("[1-4]+")) {
+                    validInput = false;
+                    break;
                 }
             }
-        }
-        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, String.join(", ", subjectName));
+            // 유효하지 않은 입력일 경우 오류 메시지 출력
+            if (!validInput ||  studentSubject.split(" ").length < 2) {
+                System.out.println("잘못된 선택입니다.");
+            }
+        } while (!validInput || studentSubject.split(" ").length < 2);
+        //2개 이상 작성
+        Arrays.asList(studentSubject.split(" ")).forEach(subject -> {
+            int subjectNumber = Integer.parseInt(subject)+4;
+            studentsubjectList.add(subjectStore.get(subjectNumber).getSubjectName());
+        });
+        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, String.join(", ", studentsubjectList));
         System.out.println("수강생을 등록 하시겠습니까?");
         System.out.println("1. 네");
         System.out.println("2. 아니오");
@@ -226,28 +250,17 @@ public class CampManagementApplication {
             System.out.println("수강생 등록 성공!\n");
         } else {
             System.out.println("수강생 등록을 취소하셨습니다.\n");
-            displayStudentView();
         }
 
     }
 
     // 수강생 목록 조회
     private static void inquireStudent() {
-        List<String> subjectName = null;
         System.out.println("\n수강생 목록을 조회합니다...");
         for (Student student : studentStore) {
-            subjectName = new ArrayList<>();
-            for (String s : student.getSubjectList()) {
-                for (Subject subject : subjectStore) {
-                    if (subject.getSubjectId().equals(s)) {
-                        subjectName.add(subject.getSubjectName());
-                    }
-                }
-            }
-            System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ", subjectName));
-
-        }
-        System.out.println("\n수강생 목록 조회 성공!");
+                System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ", student.getSubjectList()));
+          }
+            System.out.println("\n수강생 목록 조회 성공!");
     }
 
     private static void displayScoreView() {
