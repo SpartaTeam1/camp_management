@@ -110,6 +110,7 @@ public class CampManagementApplication {
                 )
         );
         scoreStore = new ArrayList<>();
+
     }
 
     // index 자동 증가
