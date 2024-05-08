@@ -1,18 +1,9 @@
 package camp;
 
-import camp.model.Score;
-import camp.model.Student;
-import camp.model.Subject;
-
+import camp.model.*;
 import java.util.*;
 import java.util.stream.Collectors;
-//import java.util.stream.Collectors;
 
-/**
- * Notification Java, 객체지향이 아직 익숙하지 않은 분들은 위한 소스코드 틀입니다. main 메서드를 실행하면 프로그램이 실행됩니다. model 의 클래스들과
- * 아래 (// 기능 구현...) 주석 부분을 완성해주세요! 프로젝트 구조를 변경하거나 기능을 추가해도 괜찮습니다! 구현에 도움을 주기위한 Base 프로젝트입니다. 자유롭게
- * 이용해주세요!
- */
 public class CampManagementApplication {
 
     // 데이터 저장소
@@ -173,6 +164,23 @@ public class CampManagementApplication {
         System.out.println("\n수강생을 등록합니다...");
         System.out.print("수강생 이름 입력: ");
         String studentName = sc.nextLine();
+        String studentStatus;
+        do {
+            System.out.print("수강생 상태 입력(GREEN, RED, YELLOW): ");
+            studentStatus = sc.nextLine().toUpperCase();
+
+            switch (studentStatus) {
+                case "GREEN":
+                case "RED":
+                case "YELLOW":
+                    validInput = true;
+                    break;
+                default:
+                    validInput = false;
+                    System.out.println("유효하지 않은 입력입니다. 다시 입력해주세요.");
+                    break;
+            }
+        } while (!validInput);
         // 필수 과목 입력
         do {
             System.out.println("수강생의 필수과목 목록 중 3가지 선택해주세요. [1.Java 2.객체지향 3.Spring 4.JPA 5.MySQL]");
@@ -225,9 +233,12 @@ public class CampManagementApplication {
             studentSubjects.add(subjectStore.get(subjectNumber));
         });
         // 수강생 정보 출력
-        System.out.printf("이름 : %-5s | 과목 : %-40s\n", studentName, studentSubjects.stream()
-                .map(Subject::getSubjectName)
-                .collect(Collectors.joining(", ")));
+        System.out.printf("이름 : %-5s | 과목 : %-40s | 상태 : %s\n",
+                studentName,
+                studentSubjects.stream()
+                        .map(Subject::getSubjectName)
+                        .collect(Collectors.joining(", ")),
+                studentStatus);
 
         // 수강생 등록 여부 확인
         System.out.println("수강생을 등록 하시겠습니까?");
@@ -236,7 +247,7 @@ public class CampManagementApplication {
         int input = sc.nextInt();
 
         if (input == 1) {
-            Student student = new Student(studentName);
+            Student student = new Student(studentName, studentStatus);
             student.setSubjectList(studentSubjects); // 수강생의 과목 리스트 설정
             studentStore.add(student);
             System.out.println("수강생 등록 성공!\n");
@@ -248,17 +259,38 @@ public class CampManagementApplication {
     // 수강생 목록 조회
     private static void inquireStudent() {
         System.out.println("\n수강생 목록을 조회합니다...");
-        for (Student student : studentStore) {
-            String subjectList = "";
-            for (int i = 0; i < student.getSubjectList().size(); i++) {
-                subjectList += student.getSubjectList().get(i).getSubjectName();
-                if (i < student.getSubjectList().size() - 1) {
-                    subjectList += ", ";
+        System.out.println("조회하실 방법을 선택해주세요. 1.전체조회 2.상태별조회");
+        int input = sc.nextInt();
+        String subjectList = "";
+        switch (input) {
+            case 1:
+                for (Student student : studentStore) {
+                    subjectList = "";
+                    for (int i = 0; i < student.getSubjectList().size(); i++) {
+                        subjectList += student.getSubjectList().get(i).getSubjectName();
+                        if (i < student.getSubjectList().size() - 1) {
+                            subjectList += ", ";
+                        }
+                    }
+                    System.out.println( "아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + subjectList + " | 상태 : " + student.getStudentStatus() );
                 }
-            }
-            System.out.println(
-                    "아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : "
-                            + subjectList);
+                break;
+            case 2:
+                sc.nextLine();
+                System.out.println("조회하실 상태를 입력하세요.(GREEN, RED, YELLOW)");
+                String status = sc.nextLine().toUpperCase();
+                studentStore.stream()
+                        .filter(student -> student.getStudentStatus().equals(status))
+                        .forEach(student -> {
+                            List<String> subjectNames = student.getSubjectList().stream()
+                                    .map(Subject::getSubjectName)
+                                    .collect(Collectors.toList());
+                            System.out.println("아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + String.join(", ", subjectNames) + " | 상태 : " + student.getStudentStatus());
+                        });
+                break;
+            default:
+                System.out.println("잘 못 입력하셨습니다.");
+                return;
         }
         System.out.println("\n수강생 목록 조회 성공!");
     }
@@ -290,7 +322,7 @@ public class CampManagementApplication {
 
     private static String getStudentId() {
         System.out.print("\n관리할 수강생의 번호를 입력하시오...");
-        String id = sc.next();
+        String id = sc.next().toUpperCase();
         if (studentStore.stream().noneMatch((Student s) -> s.getStudentId().equals(id))) {
             return null;
         }
@@ -325,7 +357,7 @@ public class CampManagementApplication {
         System.out.println();
 
         System.out.print("조회할 과목의 ID 값을 입력해주세요: ");
-        String subjectId = sc.next();
+        String subjectId = sc.next().toUpperCase();
 
         // 잘못된 과목 ID가 들어왔을 경우 메세지 출력 후 종료
         boolean isExist = false;
@@ -415,7 +447,7 @@ public class CampManagementApplication {
         });
         System.out.println();
         System.out.println("과목의 번호를 입력하시오");
-        String subjectId = sc.nextLine();
+        String subjectId = sc.nextLine().toUpperCase();
         if (subjectStore.stream().noneMatch((Subject s) -> s.getSubjectId().equals(subjectId))) {
             System.out.println("존재하지 않는 과목입니다.");
             return;
@@ -465,7 +497,7 @@ public class CampManagementApplication {
         System.out.println("수정할 과목 선택해주세요.");
         // 과목 조회
         getSubjectsByStudent(studentId);
-        String subjectId = sc.next();
+        String subjectId = sc.next().toUpperCase();
         if (subjectStore.stream().noneMatch((Subject s) -> s.getSubjectId().equals(subjectId))) {
             System.out.println("존재하지 않는 과목입니다.");
             return;
