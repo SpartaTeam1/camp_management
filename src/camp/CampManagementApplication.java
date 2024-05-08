@@ -561,7 +561,7 @@ public class CampManagementApplication {
      */
     private static void inquireAverageGradeSpecificStatusStudent() {
         System.out.print("상태를 입력해주세요(GREEN, RED, YELLOW): ");
-        String status = sc.nextLine().toUpperCase();
+        String status = sc.next().toUpperCase();
         boolean isExist = false;
         double sum = 0, count = 0;
         for (Score s : scoreStore) { // 지금까지 저장된 점수들을 확인한다.
