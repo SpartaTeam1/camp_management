@@ -363,23 +363,74 @@ public class CampManagementApplication {
         System.out.println("\n점수 수정 성공!");
     }
 
-
-
-
-
-
-
-
-
     // 수강생의 특정 과목 회차별 등급 조회
     private static void inquireRoundGradeBySubject() {
         String studentId = getStudentId(); // 관리할 수강생 고유 번호
-        // 기능 구현 (조회할 특정 과목)
+
+        // studentId를 가지는 학생 가져오기
+        Student student = null;
+        for (Student s : studentStore) {
+            if (Objects.equals(studentId, s.getStudentId())) {
+                student = s;
+            }
+        }
+
+        // 존재하지 않는 studentId가 들어올 경우 처리
+        if (student == null) {
+            System.out.println("해당 ID를 가진 학생은 없습니다.");
+            return;
+        }
+
+        // 해당 학생이 듣는 과목 보여주기
+        List<Subject> studentSubjects = student.getSubjectList();
+        System.out.printf("%-9s%-20s%n", "과목ID", "과목이름");
+        System.out.println("----------------------------");
+        studentSubjects.forEach(subject -> {
+            System.out.printf("%-10s%-20s%n", subject.getSubjectId(), subject.getSubjectName());
+        });
+        System.out.println();
 
         System.out.print("조회할 과목의 ID 값을 입력해주세요: ");
+        String subjectId = sc.next();
 
-        System.out.println("회차별 등급을 조회합니다...");
+        // 잘못된 과목 ID가 들어왔을 경우 메세지 출력 후 종료
+        boolean isExist = false;
+        for (Subject s : studentSubjects) {
+            if (Objects.equals(s.getSubjectId(), subjectId)) {
+                isExist = true;
+                break;
+            }
+        }
+        if (!isExist) {
+            System.out.println("해당 하는 과목 ID가 없습니다.");
+            return;
+        }
+
+        System.out.println(subjectId + " 회차별 등급을 조회합니다...");
+
+        List<Score> resultScore = new ArrayList<>();
         // 기능 구현
+        System.out.printf("%-9s%-20s%n", "회차", "점수");
+        System.out.println("----------------------------");
+        for (Score s : scoreStore) {
+            if (Objects.equals(student.getStudentId(), s.getStudent().getStudentId()) && Objects.equals(subjectId, s.getSubject().getSubjectId())) {
+                resultScore.add(s);
+            }
+        }
+
+        // 등록되어 있는 점수가 없을 경우 메세지 출력 후 종료
+        if (resultScore.size() == 0) {
+            System.out.println("등록되어 있는 점수가 없습니다.");
+            return;
+        }
+
+        // 회차별로 정렬해서 출력
+        List<Score> sortScore = resultScore.stream()
+                .sorted(Comparator.comparing(Score::getRound)).collect(Collectors.toList());
+        for (Score s : sortScore) {
+            System.out.printf("%-10s%-20s%n", s.getRound(), s.getScore());
+        }
+
         System.out.println("\n등급 조회 성공!");
     }
 
