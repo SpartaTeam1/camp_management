@@ -410,7 +410,7 @@ public class CampManagementApplication {
 
         List<Score> resultScore = new ArrayList<>();
         // 기능 구현
-        System.out.printf("%-9s%-20s%n", "회차", "점수");
+        System.out.printf("%-9s%-20s%n", "회차", "등급");
         System.out.println("----------------------------");
         for (Score s : scoreStore) {
             if (Objects.equals(student.getStudentId(), s.getStudent().getStudentId()) && Objects.equals(subjectId, s.getSubject().getSubjectId())) {
@@ -428,12 +428,31 @@ public class CampManagementApplication {
         List<Score> sortScore = resultScore.stream()
                 .sorted(Comparator.comparing(Score::getRound)).collect(Collectors.toList());
         for (Score s : sortScore) {
-            System.out.printf("%-10s%-20s%n", s.getRound(), s.getScore());
+            System.out.printf("%-10s%-20s%n", s.getRound(), getGrade(s));
         }
 
         System.out.println("\n등급 조회 성공!");
     }
 
-
-
+    /**
+     * Score 객체를 매개변수로 넘기면 등급을 반환해주는 함수
+     * @param score: Score 객체
+     * @return 등급
+     */
+    public static char getGrade(Score score) {
+        String subjectType = score.getSubject().getSubjectType();
+        int scoreValue = score.getScore();
+        if (Objects.equals(subjectType, SUBJECT_TYPE_MANDATORY)) {
+            if (scoreValue >= 95) return 'A';
+            else if (scoreValue >= 90) return 'B';
+            else if (scoreValue >= 80) return 'C';
+            else if (scoreValue >= 70) return 'D';
+        } else if (Objects.equals(subjectType, SUBJECT_TYPE_CHOICE)) {
+            if (scoreValue >= 90) return 'A';
+            else if (scoreValue >= 80) return 'B';
+            else if (scoreValue >= 70) return 'C';
+            else if (scoreValue >= 60) return 'D';
+        }
+        return 'F';
+    }
 }
