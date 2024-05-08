@@ -375,7 +375,7 @@ public class CampManagementApplication {
       System.out.println("존재하지 않는 과목입니다.");
       return;
     }
-    getRoundScores(subjectId);
+    getRoundScores(studentId, subjectId);
     System.out.println();
     System.out.println("변경 할 회차 입력하시오.");
     int changeRound = sc.nextInt();
@@ -399,7 +399,7 @@ public class CampManagementApplication {
       }
     }).toList();
     System.out.println("\n점수 수정 성공!");
-    getRoundScores(subjectId);
+    getRoundScores(studentId, subjectId);
   }
 
   // 수강생의 특정 과목 회차별 등급 조회
@@ -425,10 +425,12 @@ public class CampManagementApplication {
     System.out.println("과목의 번호를 입력하시오");
   }
 
-  private static void getRoundScores(String subjectId) {
+  private static void getRoundScores(String studentId, String subjectId) {
     System.out.printf("%-9s%-20s%n", "회차", "점수");
     System.out.println("----------------------------");
-    scoreStore.stream().filter(s -> s.getSubject().getSubjectId().equals(subjectId)).forEach(s -> {
+    scoreStore.stream().filter(
+        s -> s.getStudent().getStudentId().equals(studentId) && s.getSubject().getSubjectId()
+            .equals(subjectId)).forEach(s -> {
       System.out.printf("%-10d%-20d%n", s.getRound(), s.getScore());
     });
   }
