@@ -447,12 +447,14 @@ public class CampManagementApplication {
             else if (scoreValue >= 90) return 'B';
             else if (scoreValue >= 80) return 'C';
             else if (scoreValue >= 70) return 'D';
+            else if (scoreValue >= 60) return 'F';
         } else if (Objects.equals(subjectType, SUBJECT_TYPE_CHOICE)) {
             if (scoreValue >= 90) return 'A';
             else if (scoreValue >= 80) return 'B';
             else if (scoreValue >= 70) return 'C';
             else if (scoreValue >= 60) return 'D';
+            else if (scoreValue >= 50) return 'F';
         }
-        return 'F';
+        return 'N';
     }
 }
