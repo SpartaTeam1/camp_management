@@ -556,7 +556,42 @@ public class CampManagementApplication {
         });
     }
 
+    /**
+     * 특정 상태 수강생들의 필수 과목 평균 등급을 조회하는 메서드
+     */
     private static void inquireAverageGradeSpecificStatusStudent() {
+        System.out.print("상태를 입력해주세요(GREEN, RED, YELLOW): ");
+        String status = sc.nextLine().toUpperCase();
+        boolean isExist = false;
+        double sum = 0, count = 0;
+        for (Score s : scoreStore) { // 지금까지 저장된 점수들을 확인한다.
+            if (Objects.equals(s.getStudent().getStudentStatus(), status)) { // 사용자가 입력한 상태와 같다면
+                isExist = true;
+                List<Subject> subjectList = s.getStudent().getSubjectList(); // 해당 학생이 수강하는 과목 List를 불러온다.
+                for (Subject su : subjectList) { // 불러온 과목 리스트를 확인한다.
+                    if (Objects.equals(su.getSubjectType(), SUBJECT_TYPE_MANDATORY)) { // 필수 과목이라면
+                        ++count; // 평균을 구하기 위해 count를 증가시킨다.
+                        sum += s.getScore(); // 점수를 더해준다.
+                    }
+                }
+            }
+        }
 
+        // 해당 상태를 가진 학생이 없다면 메세지 출력 후 종료
+        if (!isExist) {
+            System.out.println(status + " 상태를 가진 학생이 존재하지 않습니다.");
+            return;
+        }
+
+        // 평균 점수를 구하고 그 점수의 등급을 표시해준다.
+        double gradeAvg = sum / count;
+        char grade = 'N';
+        if (gradeAvg >= 95) grade = 'A';
+        else if(gradeAvg >= 90) grade = 'B';
+        else if(gradeAvg >= 80) grade = 'C';
+        else if(gradeAvg >= 70) grade = 'D';
+        else if(gradeAvg >= 60) grade = 'F';
+
+        System.out.println(status + " 상태 학생들의 평균 등급: " + grade);
     }
 }
