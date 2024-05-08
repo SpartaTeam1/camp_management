@@ -5,12 +5,15 @@ import java.util.ArrayList;
 public class Student {
     private String studentId;
     private String studentName;
+
+    private List<Subject> subjectList; // 수강과목 저장할 리스트
+
     private static int NO = 1;
-    private final List<String> subjectList = new ArrayList<>();
 
     public Student(String studentName) {
-        studentId = "STU" + NO;
+        studentId = "ST" + NO;
         this.studentName = studentName;
+        this.subjectList = new ArrayList<>(); // 초기화
         ++NO;
     }
 
@@ -22,7 +25,13 @@ public class Student {
     public String getStudentName() {
         return studentName;
     }
-    public List<String> getSubjectList() {
+
+    public List<Subject> getSubjectList() {
         return subjectList;
     }
+
+    public void setSubjectList(List<Subject> subjectList) {
+        this.subjectList = subjectList;
+    }
+
 }
