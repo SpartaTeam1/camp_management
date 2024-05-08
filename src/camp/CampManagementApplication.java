@@ -562,28 +562,44 @@ public class CampManagementApplication {
     private static void inquireAverageGradeSpecificStatusStudent() {
         System.out.print("상태를 입력해주세요(GREEN, RED, YELLOW): ");
         String status = sc.next().toUpperCase();
-        boolean isExist = false;
+
+        // 입력 들어온 상태와 같은 상태만 모아서 리스트를 가져오고
+        // studentId로 정렬한다.
+        List<Score> statusScore = scoreStore.stream()
+                .filter(score -> Objects.equals(score.getStudent().getStudentStatus(), status))
+                .sorted((s1, s2) -> s1.getStudent().getStudentId().compareTo(s2.getStudent().getStudentId()))
+                .toList();
+
+        System.out.println(status + " 상태 학생의 평균등급을 조회합니다...");
+        System.out.printf("%-9s%-20s%n", "이름", "평균등급");
+        System.out.println("----------------------------");
+        Student student = statusScore.getFirst().getStudent(); // statusScore의 첫번째 Student 객체를 가져온다.
         double sum = 0, count = 0;
-        for (Score s : scoreStore) { // 지금까지 저장된 점수들을 확인한다.
-            if (Objects.equals(s.getStudent().getStudentStatus(), status)) { // 사용자가 입력한 상태와 같다면
-                isExist = true;
-                List<Subject> subjectList = s.getStudent().getSubjectList(); // 해당 학생이 수강하는 과목 List를 불러온다.
-                for (Subject su : subjectList) { // 불러온 과목 리스트를 확인한다.
-                    if (Objects.equals(su.getSubjectType(), SUBJECT_TYPE_MANDATORY)) { // 필수 과목이라면
-                        ++count; // 평균을 구하기 위해 count를 증가시킨다.
-                        sum += s.getScore(); // 점수를 더해준다.
-                    }
-                }
-            }
+        for (Score s : statusScore) {
+           if (Objects.equals(s.getStudent(), student)) {
+               sum += s.getScore();
+               ++count;
+           } else {
+               System.out.printf("%-10s%-20s%n", student.getStudentName(), getAverageGrade(sum, count));
+               student = s.getStudent();
+               sum = 0;
+               count = 0;
+               if (Objects.equals(s.getScoreId(), statusScore.getLast().getScoreId())) {
+                   sum += s.getScore();
+                   ++count;
+               }
+           }
         }
+        System.out.printf("%-10s%-20s%n", student.getStudentName(), getAverageGrade(sum, count));
+    }
 
-        // 해당 상태를 가진 학생이 없다면 메세지 출력 후 종료
-        if (!isExist) {
-            System.out.println(status + " 상태를 가진 학생이 존재하지 않습니다.");
-            return;
-        }
-
-        // 평균 점수를 구하고 그 점수의 등급을 표시해준다.
+    /**
+     * 합과 수를 넘기면 평균 등급을 반환해주는 메서드
+     * @param sum : 점수의 합
+     * @param count : 개수
+     * @return : 평균 등급
+     */
+    private static char getAverageGrade(double sum, double count) {
         double gradeAvg = sum / count;
         char grade = 'N';
         if (gradeAvg >= 95) grade = 'A';
@@ -591,7 +607,6 @@ public class CampManagementApplication {
         else if(gradeAvg >= 80) grade = 'C';
         else if(gradeAvg >= 70) grade = 'D';
         else if(gradeAvg >= 60) grade = 'F';
-
-        System.out.println(status + " 상태 학생들의 평균 등급: " + grade);
+        return grade;
     }
 }
