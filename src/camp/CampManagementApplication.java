@@ -379,7 +379,8 @@ public class CampManagementApplication {
     System.out.println();
     System.out.println("변경 할 회차 입력하시오.");
     int changeRound = sc.nextInt();
-    if (scoreStore.stream().noneMatch(s -> s.getRound() == changeRound && s.getSubject().getSubjectId().equals(subjectId))) {
+    if (scoreStore.stream().noneMatch(
+        s -> s.getRound() == changeRound && s.getSubject().getSubjectId().equals(subjectId))) {
       System.out.println("회차가 존재하지 않습니다.");
       return;
     }
@@ -391,8 +392,9 @@ public class CampManagementApplication {
     }
     System.out.println("시험 점수를 수정합니다...");
     // 기능 구현
-    List<Score> collect = scoreStore.stream().peek(s -> {
-      if (s.getStudent().getStudentId().equals(studentId) && s.getRound() == changeRound) {
+    scoreStore.stream().peek(s -> {
+      if (s.getStudent().getStudentId().equals(studentId) && s.getSubject().getSubjectId()
+          .equals(subjectId) && s.getRound() == changeRound) {
         s.setScore(changeScore);
       }
     }).toList();
