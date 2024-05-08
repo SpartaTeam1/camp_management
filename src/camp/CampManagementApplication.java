@@ -265,15 +265,14 @@ public class CampManagementApplication {
         switch (input) {
             case 1:
                 for (Student student : studentStore) {
+                    subjectList = "";
                     for (int i = 0; i < student.getSubjectList().size(); i++) {
                         subjectList += student.getSubjectList().get(i).getSubjectName();
                         if (i < student.getSubjectList().size() - 1) {
                             subjectList += ", ";
                         }
                     }
-                    System.out.println(
-                            "아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : "
-                                    + subjectList);
+                    System.out.println( "아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + subjectList + " | 상태 : " + student.getStudentStatus() );
                 }
                 break;
             case 2:
