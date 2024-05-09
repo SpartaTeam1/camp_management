@@ -359,6 +359,7 @@ public class CampManagementApplication {
                 case 1 -> createScore(); // 수강생의 과목별 시험 회차 및 점수 등록
                 case 2 -> updateRoundScoreBySubject(); // 수강생의 과목별 회차 점수 수정
                 case 3 -> inquireRoundGradeBySubject(); // 수강생의 특정 과목 회차별 등급 조회
+                case 4 -> CheckAverageGradeBySubject(); // 과목별 평균 등급 조회
                 case 5 -> inquireAverageGradeSpecificStatusStudent(); // 특정 상태 수강생들의 필수 과목 평균 등급 조회
                 case 6 -> flag = false; // 메인 화면 이동
                 default -> {
@@ -661,5 +662,22 @@ public class CampManagementApplication {
         else if(gradeAvg >= 70) grade = 'D';
         else if(gradeAvg >= 60) grade = 'F';
         return grade;
+    }
+
+    private static void CheckAverageGradeBySubject() {
+        System.out.printf("%-8s%-10s%5s%n", "평균 등급", "평균 점수", "과목");
+        Subject subject = new Subject();
+        for (int i = 0; i < subjectStore.size(); i++) {
+            double averageScore = GetSubjectAverageScore(i);
+            subject.setSubjectType(subjectStore.get(i).getSubjectType());
+            System.out.printf("%5s%5s%8.2f%8s%-20s%n", getGrade(new Score(subject, (int) averageScore)),
+                " ", averageScore, " ", subjectStore.get(i).getSubjectName());
+        }
+    }
+
+    private static double GetSubjectAverageScore(int idx) {
+        return scoreStore.stream()
+            .filter(s -> s.getSubject().getSubjectName().equals(subjectStore.get(idx).getSubjectName()))
+            .mapToDouble(Score::getScore).average().orElse(0);
     }
 }
