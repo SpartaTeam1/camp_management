@@ -409,6 +409,7 @@ public class CampManagementApplication {
                 case 1 -> createScore(); // 수강생의 과목별 시험 회차 및 점수 등록
                 case 2 -> updateRoundScoreBySubject(); // 수강생의 과목별 회차 점수 수정
                 case 3 -> inquireRoundGradeBySubject(); // 수강생의 특정 과목 회차별 등급 조회
+                case 4 -> CheckAverageGradeBySubject(); // 과목별 평균 등급 조회
                 case 5 -> inquireAverageGradeSpecificStatusStudent(); // 특정 상태 수강생들의 필수 과목 평균 등급 조회
                 case 6 -> flag = false; // 메인 화면 이동
                 default -> {
@@ -491,7 +492,7 @@ public class CampManagementApplication {
 
         // 회차별로 정렬해서 출력
         List<Score> sortScore = resultScore.stream()
-                .sorted(Comparator.comparing(Score::getRound)).toList();
+                .sorted(Comparator.comparing(Score::getRound)).collect(Collectors.toList());
         for (Score s : sortScore) {
             System.out.printf("%-10s%-20s%n", s.getRound(), getGrade(s));
         }
@@ -536,7 +537,7 @@ public class CampManagementApplication {
         sc.nextLine();
 
         Student student = studentStore.stream()
-                .filter((Student s) -> s.getStudentId().equals(studentId)).toList().getFirst(); // 수강중인 과목 필터링
+                .filter((Student s) -> s.getStudentId().equals(studentId)).toList().get(0); // 수강중인 과목 필터링
         List<Subject> enrolledSubject = student.getSubjectList();
         System.out.println("\n다음은 " + student.getStudentName() + " 학생의 수강 과목입니다.");
         System.out.printf("%-9s%-20s%n", "과목ID", "과목이름");
@@ -592,11 +593,6 @@ public class CampManagementApplication {
     // 수강생의 과목별 회차 점수 수정
     private static void updateRoundScoreBySubject() {
         String studentId = getStudentId(); // 관리할 수강생 고유 번호
-        if (studentId == null) {
-            System.out.println("존재하지 않는 수강생입니다.");
-            return;
-        }
-        sc.nextLine();
         // 기능 구현 (수정할 과목 및 회차, 점수)
         System.out.println("수정할 과목 선택해주세요.");
         // 과목 조회
@@ -716,5 +712,22 @@ public class CampManagementApplication {
         else if(gradeAvg >= 70) grade = 'D';
         else if(gradeAvg >= 60) grade = 'F';
         return grade;
+    }
+
+    private static void CheckAverageGradeBySubject() {
+        System.out.printf("%-8s%-10s%5s%n", "평균 등급", "평균 점수", "과목");
+        Subject subject = new Subject();
+        for (int i = 0; i < subjectStore.size(); i++) {
+            double averageScore = GetSubjectAverageScore(i);
+            subject.setSubjectType(subjectStore.get(i).getSubjectType());
+            System.out.printf("%5s%5s%8.2f%8s%-20s%n", getGrade(new Score(subject, (int) averageScore)),
+                " ", averageScore, " ", subjectStore.get(i).getSubjectName());
+        }
+    }
+
+    private static double GetSubjectAverageScore(int idx) {
+        return scoreStore.stream()
+            .filter(s -> s.getSubject().getSubjectName().equals(subjectStore.get(idx).getSubjectName()))
+            .mapToDouble(Score::getScore).average().orElse(0);
     }
 }
