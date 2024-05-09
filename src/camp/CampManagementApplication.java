@@ -409,7 +409,7 @@ public class CampManagementApplication {
      * @param score: Score 객체
      * @return 등급
      */
-    private static char getGrade(Score score) {
+    public static char getGrade(Score score) {
         String subjectType = score.getSubject().getSubjectType();
         int scoreValue = score.getScore();
         if (Objects.equals(subjectType, SUBJECT_TYPE_MANDATORY)) {
@@ -555,7 +555,6 @@ public class CampManagementApplication {
             System.out.printf("%-10d%-20d%n", s.getRound(), s.getScore());
         });
     }
-
     /**
      * 특정 상태 수강생들의 필수 과목 평균 등급을 조회하는 메서드
      */
@@ -584,19 +583,19 @@ public class CampManagementApplication {
         Student student = statusScore.getFirst().getStudent(); // statusScore의 첫번째 Student 객체를 가져온다.
         double sum = 0, count = 0;
         for (Score s : statusScore) {
-           if (Objects.equals(s.getStudent(), student)) {
-               sum += s.getScore();
-               ++count;
-           } else {
-               System.out.printf("%-10s%-20s%n", student.getStudentName(), getAverageGrade(sum, count));
-               student = s.getStudent();
-               sum = 0;
-               count = 0;
-               if (Objects.equals(s.getScoreId(), statusScore.getLast().getScoreId())) {
-                   sum += s.getScore();
-                   ++count;
-               }
-           }
+            if (Objects.equals(s.getStudent(), student)) {
+                sum += s.getScore();
+                ++count;
+            } else {
+                System.out.printf("%-10s%-20s%n", student.getStudentName(), getAverageGrade(sum, count));
+                student = s.getStudent();
+                sum = 0;
+                count = 0;
+                if (Objects.equals(s.getScoreId(), statusScore.getLast().getScoreId())) {
+                    sum += s.getScore();
+                    ++count;
+                }
+            }
         }
         System.out.printf("%-10s%-20s%n", student.getStudentName(), getAverageGrade(sum, count));
     }

@@ -9,6 +9,11 @@ public class Score {
   private int score;
 
 
+  public Score(Subject subject, int score) {
+    this.subject = subject;
+    this.score = score;
+  }
+
   public Score(String scoreId, Student student, Subject subject, int round, int score) {
     this.scoreId = scoreId;
     this.student = student;
