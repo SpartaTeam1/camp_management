@@ -567,20 +567,21 @@ public class CampManagementApplication {
         // studentId로 정렬한다.
         List<Score> statusScore = scoreStore.stream()
                 .filter(score -> Objects.equals(score.getStudent().getStudentStatus(), status))
+                .filter(score -> Objects.equals(score.getSubject().getSubjectType(), SUBJECT_TYPE_MANDATORY))
                 .sorted((s1, s2) -> s1.getStudent().getStudentId().compareTo(s2.getStudent().getStudentId()))
                 .toList();
 
         // status 상태의 Student 객체가 존재하지 않는다면 메세지 호출 후 종료
         // 또는 해당 학생의 점수가 등록되어 있지 않을 경우
         if (statusScore.size() == 0) {
-            System.out.println(status + " 상태의 학생이 존재하지 않거나 해당 학생의 등록되어 있는 점수가 없습니다.");
+            System.out.println(status + " 상태의 학생이 존재하지 않거나 해당 학생의 등록되어 있는 필수 과목 점수가 없습니다.");
             return;
         }
 
         System.out.println(status + " 상태 학생의 평균등급을 조회합니다...");
         System.out.printf("%-9s%-20s%n", "이름", "평균등급");
         System.out.println("----------------------------");
-        Student student = statusScore.getFirst().getStudent(); // statusScore의 첫번째 Student 객체를 가져온다.
+        Student student = statusScore.get(0).getStudent(); // statusScore의 첫번째 Student 객체를 가져온다.
         double sum = 0, count = 0;
         for (Score s : statusScore) {
            if (Objects.equals(s.getStudent(), student)) {
@@ -591,7 +592,7 @@ public class CampManagementApplication {
                student = s.getStudent();
                sum = 0;
                count = 0;
-               if (Objects.equals(s.getScoreId(), statusScore.getLast().getScoreId())) {
+               if (Objects.equals(s.getScoreId(), statusScore.get(statusScore.size() - 1).getScoreId())) {
                    sum += s.getScore();
                    ++count;
                }
