@@ -298,7 +298,57 @@ public class CampManagementApplication {
         System.out.println("\n수강생 목록 조회 성공!");
     }
     private static void modifyStudent() {
+        System.out.println("\n수강생 수정 화면입니다...");
+        String studentId = getStudentId(); // 관리할 수강생 고유 번호
 
+        // studentId를 가지는 학생 가져오기
+        Student student = null;
+        for (Student s : studentStore) {
+            if (Objects.equals(studentId, s.getStudentId())) {
+                student = s;
+            }
+        }
+        // 존재하지 않는 studentId가 들어올 경우 처리
+        if (student == null) {
+            System.out.println("해당 ID를 가진 학생은 없습니다.");
+            return;
+        }
+        studentStore.stream()
+                .filter(s -> s.getStudentId().equals(studentId))
+                .forEach(s -> {
+                    List<String> subjectNames = s.getSubjectList().stream()
+                            .map(Subject::getSubjectName)
+                            .collect(Collectors.toList());
+                    System.out.println("아이디 : " + s.getStudentId() + " | 이름 : " + s.getStudentName() + " | 과목 : " + String.join(", ", subjectNames) + " | 상태 : " + s.getStudentStatus());
+                });//삭제할 수강생 출력
+        System.out.println("수강생의 이름과 상태 중 변경하고 싶으신 것을 선택해주세요 1.이름 2.상태");
+        int input = sc.nextInt();
+        switch (input){
+            case 1:
+                System.out.print("수강생의 새로운 이름을 입력해주세요 : ");
+                sc.nextLine();
+                String name = sc.nextLine();
+                for (Student studentList : studentStore) {
+                    if (studentList.getStudentId().equals(studentId)) {
+                        studentList.setStudentName(name);
+                        System.out.println("수정되었습니다.");
+                    }
+                }
+                break;
+            case 2:
+                System.out.print("수강생의 새로운 상태를 입력해주세요(GREEN,RED,YELLOW) : ");
+                sc.nextLine();
+                String status = sc.nextLine().toUpperCase();
+                for (Student studentList : studentStore) {
+                    if (studentList.getStudentId().equals(studentId)) {
+                        studentList.setStudentStatus(status);
+                        System.out.println("수정되었습니다.");
+                    }
+                }
+                break;
+            default:
+                System.out.println("잘 못 선택하셨습니다.");
+        }
     }
     public static void deleteStudent() {
         System.out.println("\n수강생 삭제화면입니다...");
