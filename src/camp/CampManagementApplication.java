@@ -581,7 +581,7 @@ public class CampManagementApplication {
         System.out.println(status + " 상태 학생의 평균등급을 조회합니다...");
         System.out.printf("%-9s%-20s%n", "이름", "평균등급");
         System.out.println("----------------------------");
-        Student student = statusScore.get(0).getStudent(); // statusScore의 첫번째 Student 객체를 가져온다.
+        Student student = statusScore.getFirst().getStudent(); // statusScore의 첫번째 Student 객체를 가져온다.
         double sum = 0, count = 0;
         for (Score s : statusScore) {
            if (Objects.equals(s.getStudent(), student)) {
@@ -592,7 +592,7 @@ public class CampManagementApplication {
                student = s.getStudent();
                sum = 0;
                count = 0;
-               if (Objects.equals(s.getScoreId(), statusScore.get(statusScore.size() - 1).getScoreId())) {
+               if (Objects.equals(s.getScoreId(), statusScore.getLast().getScoreId())) {
                    sum += s.getScore();
                    ++count;
                }
