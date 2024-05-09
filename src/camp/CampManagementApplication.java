@@ -12,8 +12,8 @@ public class CampManagementApplication {
     private static List<Score> scoreStore;
 
     // 과목 타입
-    private static String SUBJECT_TYPE_MANDATORY = "MANDATORY";
-    private static String SUBJECT_TYPE_CHOICE = "CHOICE";
+    private static final String SUBJECT_TYPE_MANDATORY = "MANDATORY";
+    private static final String SUBJECT_TYPE_CHOICE = "CHOICE";
 
     // index 관리 필드
     private static int studentIndex;
@@ -139,14 +139,18 @@ public class CampManagementApplication {
             System.out.println("수강생 관리 실행 중...");
             System.out.println("1. 수강생 등록");
             System.out.println("2. 수강생 목록 조회");
-            System.out.println("3. 메인 화면 이동");
+            System.out.println("3. 수강생 수정");
+            System.out.println("4. 수강생 삭제");
+            System.out.println("5. 메인 화면 이동");
             System.out.print("관리 항목을 선택하세요...");
             int input = sc.nextInt();
 
             switch (input) {
                 case 1 -> createStudent(); // 수강생 등록
                 case 2 -> inquireStudent(); // 수강생 목록 조회
-                case 3 -> flag = false; // 메인 화면 이동
+                case 3 -> modifyStudent(); // 수강생 수정
+                case 4 -> deleteStudent(); // 수강생 삭제
+                case 5 -> flag = false; // 메인 화면 이동
                 default -> {
                     System.out.println("잘못된 입력입니다.\n메인 화면 이동...");
                     flag = false;
@@ -154,7 +158,6 @@ public class CampManagementApplication {
             }
         }
     }
-
     // 수강생 등록
     private static void createStudent() {
         String studentSubject;
@@ -261,15 +264,15 @@ public class CampManagementApplication {
         System.out.println("\n수강생 목록을 조회합니다...");
         System.out.println("조회하실 방법을 선택해주세요. 1.전체조회 2.상태별조회");
         int input = sc.nextInt();
-        String subjectList = "";
+        StringBuilder subjectList = new StringBuilder();
         switch (input) {
             case 1:
                 for (Student student : studentStore) {
-                    subjectList = "";
+                    subjectList = new StringBuilder();
                     for (int i = 0; i < student.getSubjectList().size(); i++) {
-                        subjectList += student.getSubjectList().get(i).getSubjectName();
+                        subjectList.append(student.getSubjectList().get(i).getSubjectName());
                         if (i < student.getSubjectList().size() - 1) {
-                            subjectList += ", ";
+                            subjectList.append(", ");
                         }
                     }
                     System.out.println( "아이디 : " + student.getStudentId() + " | 이름 : " + student.getStudentName() + " | 과목 : " + subjectList + " | 상태 : " + student.getStudentStatus() );
@@ -293,6 +296,49 @@ public class CampManagementApplication {
                 return;
         }
         System.out.println("\n수강생 목록 조회 성공!");
+    }
+    private static void modifyStudent() {
+
+    }
+    public static void deleteStudent() {
+        System.out.println("\n수강생 삭제화면입니다...");
+        String studentId = getStudentId(); // 관리할 수강생 고유 번호
+
+        // studentId를 가지는 학생 가져오기
+        Student student = null;
+        for (Student s : studentStore) {
+            if (Objects.equals(studentId, s.getStudentId())) {
+                student = s;
+            }
+        }
+        // 존재하지 않는 studentId가 들어올 경우 처리
+        if (student == null) {
+            System.out.println("해당 ID를 가진 학생은 없습니다.");
+            return;
+        }
+        studentStore.stream()
+                .filter(s -> s.getStudentId().equals(studentId))
+                .forEach(s -> {
+                    List<String> subjectNames = s.getSubjectList().stream()
+                            .map(Subject::getSubjectName)
+                            .collect(Collectors.toList());
+                    System.out.println("아이디 : " + s.getStudentId() + " | 이름 : " + s.getStudentName() + " | 과목 : " + String.join(", ", subjectNames) + " | 상태 : " + s.getStudentStatus());
+                });//삭제할 수강생 출력
+        System.out.println("수강생을 삭제 하시겠습니까?");
+        System.out.println("1. 네");
+        System.out.println("2. 아니오");
+        int input = sc.nextInt();
+        if(input == 1) {
+            for (Student s : studentStore)
+                if (s.getStudentId().equals(studentId)) {
+                    studentStore.remove(s);
+                    scoreStore.removeIf(score -> score.getStudent().equals(s.getStudentId()));
+                    System.out.println("수강생이 삭제되었습니다.");
+                    break;
+                }
+        }else{
+            System.out.println("수강생 삭제를 취소하셨습니다.");
+        }
     }
 
     private static void displayScoreView() {
