@@ -10,7 +10,11 @@ public class Subject {
     this.subjectName = subjectName;
     this.subjectType = subjectType;
   }
-
+  // Setter
+  public void setSubjectType(String subjectType) {
+    this.subjectType = subjectType;
+  }
+  
   // Getter
   public String getSubjectId() {
     return subjectId;
