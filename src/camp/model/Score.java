@@ -1,11 +1,18 @@
 package camp.model;
 
 public class Score {
+
   private String scoreId;
   private Student student;
   private Subject subject;
   private int round;
   private int score;
+
+
+  public Score(Subject subject, int score) {
+    this.subject = subject;
+    this.score = score;
+  }
 
   public Score(String scoreId, Student student, Subject subject, int round, int score) {
     this.scoreId = scoreId;
